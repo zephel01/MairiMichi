@@ -1,0 +1,167 @@
+# MairiMichi 収録優先度ポリシー v1
+#
+# 【方針】収録する順番は「大きい／有名」ではなく「よく行かれている」で決める。
+#
+# 【最重要】このスコアは内部の作業順であって、ユーザーに見せる順位ではない。
+#   - D1 の公開テーブルにも API レスポンスにも載せない
+#   - 一覧の並べ替えは「目的への適合順」のみ（設計書 §9.2-a）
+#   - 「当サイトの人気順」のような表示は作らない
+#
+# 【最重要2】収録の「可否」と「順番」を分離する。
+#   可否 = 宗教法人リスト / OSM / Wikidata の和集合。スコアは一切使わない。
+#   順番 = このスコアでキューを並べ替えるだけ。
+#   分離しないと「Wikipedia に記事が無い＝存在しない」が構造化される。
+#   実測: 神道系神社 80,994社に対し ja.Wikipedia 記事があるのは 6,076社（7.5%）。
+
+version: 1
+updated: 2026-08-31
+
+# ── スコア定義 ────────────────────────────────────────
+score:
+  formula: |
+    score = 0.35 * norm(log(pv_base_median))
+          + 0.30 * norm(min(new_year_ratio, 3.0))
+          + 0.25 * norm(log(official_visitors))
+          + 0.05 * norm(sitelinks)
+          + 0.05 * flag_goshuin
+
+  weights:
+    pv_base_median:    0.35   # 平常月viewsの中央値。基礎的な関心量
+    new_year_ratio:    0.30   # ★正月比。観光⇔参拝の分離。スコアの核
+    official_visitors: 0.25   # 都道府県観光入込客統計の実数。唯一の実測足数
+    sitelinks:         0.05   # 国際的知名度の補助
+    flag_goshuin:      0.05   # 現役で機能している社の検出
+
+# ── 正月比 ────────────────────────────────────────────
+new_year_ratio:
+  definition: 1月views ÷ 平常月viewsの中央値
+  base_months: [3, 4, 6, 7]     # 平常月。5月はGWで跳ねるので除外
+  aggregate: median             # ★平均ではなく中央値（ニュースのスパイク対策）
+  clip: 3.0                     # 記事新規作成等の異常値対策
+
+  # 実測（2026-01 / ja.wikipedia / all-access / user）
+  # この表がこの指標を採用した根拠。
+  observed:
+    - { site: 明治神宮,       total_8m: 67598,  base: 6436,  ratio: 2.86, read: 参拝地 }
+    - { site: 浅草寺,         total_8m: 61858,  base: 5935,  ratio: 2.03, read: 参拝地 }
+    - { site: 出雲大社,       total_8m: 133149, base: 14223, ratio: 1.82, read: 観光と参拝の混在 }
+    - { site: 廣瀬大社,       total_8m: 6809,   base: 741,   ratio: 1.72, read: ★小規模だが伏見稲荷を上回る }
+    - { site: 太宰府天満宮,   total_8m: 38520,  base: 4078,  ratio: 1.72, read: 参拝地 }
+    - { site: 鶴岡八幡宮,     total_8m: 61866,  base: 6508,  ratio: 1.65, read: 参拝地 }
+    - { site: 伏見稲荷大社,   total_8m: 66015,  base: 6929,  ratio: 1.59, read: 観光比率が高い }
+    - { site: 籠神社,         total_8m: 19675,  base: 2251,  ratio: 1.43, read: 観光比率が高い }
+    - { site: 田縣神社,       total_8m: 7646,   base: 934,   ratio: 1.42, read: 話題性由来（3月に豊年祭スパイク） }
+    - { site: 清水寺,         total_8m: 90709,  base: 9561,  ratio: 1.17, read: ★純粋な観光地 }
+
+  key_finding: |
+    廣瀬大社（総views は伏見稲荷の1/10）の正月比 1.72 が伏見稲荷 1.59 を上回る。
+    「絶対数は小さいが、地元の人がちゃんと初詣に行く社」を機械的に拾える
+    唯一の指標。「マイナーだが実際に参拝されている社」の検出器として使う。
+
+# ── データ源 ──────────────────────────────────────────
+sources:
+  pageviews:
+    method: dump                # ★APIではなくダンプ。per-articleはバッチ不可＋429頻発
+    url_pattern: https://dumps.wikimedia.org/other/pageview_complete/monthly/{YYYY}/{YYYY-MM}/pageviews-{YYYYMM}-user.bz2
+    size_approx: 4.7GB
+    license: CC0 1.0            # 帰属表示すら不要
+    project: ja.wikipedia
+    access: all-access
+    agent: user                 # bot/spider を除外
+    exclude_current_month: true # ★当月は未確定。2026-08は全記事で異常値だった
+
+  official_visitors:
+    name: 都道府県 観光入込客統計
+    basis: 観光庁「観光入込客統計に関する共通基準」
+    note: |
+      「歴史・文化」分類に「神社・仏閣」が明示的に含まれ、観光地点等別に
+      入込客数を把握すると規定。都道府県が地点別で公表している。
+      選定基準は「前年 年間1万人以上、若しくは前年の特定月が5千人以上」。
+    verified_example:
+      prefecture: 福島県
+      year: 令和6年
+      table: 表10
+      data:
+        - { name: 伊佐須美神社,             visitors: 1127550 }
+        - { name: 福満虚空蔵菩薩圓藏寺,     visitors: 409251 }
+        - { name: 山本不動尊,               visitors: 115500 }
+        - { name: 霊山神社,                 visitors: 11831 }
+        - { name: 隠津島神社,               visitors: 5600 }
+    bias: 「観光地点」に登録された社寺のみ。純粋な氏神は構造的に不掲載。年間1万人未満は原則対象外。
+    status: 47都道府県すべてが地点別で公表しているかは未確認（福島県で1例確認）
+
+  sitelinks:
+    endpoint: https://qlever.dev/api/wikidata   # ★本家より高速（15ms vs 6.8秒）
+    note: 本家 query.wikidata.org は502・タイムアウトが多い
+    weight_reason: 補助のみ。世界遺産バイアスが直撃し、77%がsitelinks=0で解像度不足
+
+# ── 記事なし社の別系統優先度（★氏神様問題への対処）──────
+no_article_priority:
+  reason: |
+    神社の92.5%は ja.Wikipedia 記事が無く、Wikipedia由来のいかなる指標でも
+    スコア0になる。その多くは日常的に参拝されている地域の氏神。
+  criteria:
+    - id: official_visitors_listed
+      desc: 都道府県観光入込客統計に地点として掲載されている
+      weight: high
+    - id: osm_has_name
+      desc: OSM に name がある（＝現地で認識されている）
+      weight: medium
+      note: OSMの神社オブジェクトの約33%は名前すら付いていない
+    - id: shakaku
+      desc: 式内社・一之宮・別表神社などの社格
+      weight: medium
+    - id: nearby_population
+      desc: 近隣人口密度（「氏神は氏子の数だけ参拝される」）
+      weight: high
+      note: |
+        Wikipedia に依存しない唯一の全国一様な代理指標。
+        国勢調査メッシュ統計で算出可能。ただし仮説自体が未検証なので
+        Phase 1 で効果測定すること。
+
+# ── 採用しないもの（実測で棄却）──────────────────────
+rejected:
+  - id: hatsumode_ranking_web
+    label: ネットの「初詣参拝者数ランキング」
+    verdict: 使用禁止
+    reason: |
+      警察庁は2009年で発表を取りやめており、流通している数字はその孫引き。
+      tabi-mag.jp の「例年」値と2009年警察庁データを突合したところ、
+      明治神宮318万/319万、住吉大社234万/235万、太宰府200万/204万と
+      順位構造も値もほぼ一致。17年前のデータが再循環している。
+      しかも警察庁の数字自体が独立測定ではなく寺社の自己申告の集計だった。
+
+  - id: osm_tag_richness
+    label: OSM のタグ充実度
+    verdict: 仮説を反証
+    reason: |
+      「よく行かれる社ほどマッパーが詳しく書く」は成立しない。
+      伏見稲荷大社が opening_hours も website も持たず、
+      無名寄りの籠神社が opening_hours を持つ。website は有名10社中1社のみ。
+      測っているのは「その地域に熱心なマッパーがいるか」。
+    still_useful_for: 位置情報・名寄せ・wikidata紐付け（9.77%）の基盤
+
+  - id: google_places_ratings
+    label: Google Places の rating / userRatingCount
+    verdict: 規約違反
+    reason: |
+      Maps Service Terms §14.3 で30日キャッシュが認められているのは緯度経度のみ。
+      恒久保存できるのは place_id だけ。内部ランキングの永続保存はできない。
+
+  - id: hotokami_visit_counts
+    label: ホトカミの参拝記録数
+    verdict: 参照のみ
+    reason: |
+      同種の競合サービス。機械的収集は規約・著作権上のリスク。
+      指標の妥当性検証の参照に留める。
+      なお実測では 烏森神社（限定御朱印）・東京大神宮（縁結び）が規模順では
+      説明できない位置に入る＝測っているのは「御朱印収集者に行かれる度」。
+
+# ── バイアス総括（必ず設計判断の前提にすること）────────
+bias:
+  pageviews_absolute:  { tourist: 極大, urban: 中,   author: 大 }
+  pageviews_newyear:   { tourist: 小,   urban: 小,   author: 中 }   # ★最大の利点
+  official_visitors:   { tourist: 大,   urban: 中,   author: なし } # 実測
+  wikidata_sitelinks:  { tourist: 極大, urban: 中,   author: 極大 }
+  osm_tags:            { tourist: 中,   urban: 極大, author: 極大 }
+  goshuin_records:     { tourist: 中,   urban: 大,   author: 極大 }

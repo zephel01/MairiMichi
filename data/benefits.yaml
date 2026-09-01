@@ -1,0 +1,116 @@
+# MairiMichi 御利益タクソノミ v1
+# 大分類10（ユーザー提示の8分類 ＋ 調査で判明した欠落2つ）× 細分類
+# 追加2件の根拠: ホトカミ実測で 家内安全 3,710件 / 五穀豊穣 4,276件（最多）が
+#                提示8分類のどこにも入らない。稲荷・住吉・八幡・天照・スサノオ・
+#                諏訪・大国主が共通で持つ主要御利益のため、落とすと導出結果の
+#                大部分が行き場を失う。
+# 分割2件の根拠: 商売繁盛4,297 vs 金運1,164（3.7倍差・意図が違う）
+#                病気平癒3,757 vs 健康長寿2,506（治療中 vs 予防）
+
+version: 1
+updated: 2026-08-31
+
+majors:
+  - id: enmusubi
+    label: 縁結び・恋愛・夫婦
+    minors:
+      - { id: enmusubi_love,    label: 縁結び }
+      - { id: renai_jouju,      label: 恋愛成就 }
+      - { id: fuufu_enman,      label: 夫婦円満 }
+      - { id: enkiri,           label: 縁切り }
+    typical_shinto: 大国主（出雲・大社系）、東京大神宮
+    typical_buddhist: 弁財天、一部の観音
+
+  - id: shoubai
+    label: 商売繁盛・金運
+    minors:
+      - { id: shoubai_hanjou,   label: 商売繁盛 }
+      - { id: kinun,            label: 金運・財運 }
+      - { id: jigyou_hanei,     label: 事業繁栄 }
+    typical_shinto: 稲荷、恵比寿、大黒
+    typical_buddhist: 弁財天、大黒天、毘沙門天
+
+  - id: gakugyou
+    label: 学業・合格
+    minors:
+      - { id: jyuken_goukaku,   label: 受験合格 }
+      - { id: gakugyou_jouju,   label: 学業成就 }
+      - { id: shikaku_chie,     label: 資格・知恵 }
+    typical_shinto: 天満宮（菅原道真）
+    typical_buddhist: 文殊菩薩、虚空蔵菩薩
+
+  - id: kenkou
+    label: 健康・平癒
+    minors:
+      - { id: byouki_heiyu,     label: 病気平癒 }
+      - { id: kenkou_chouju,    label: 健康長寿 }
+      - { id: boke_fuuji,       label: ボケ封じ }
+    typical_shinto: 住吉、白山など
+    typical_buddhist: 薬師如来、観音、地蔵
+    note: 医療の代替と読める表現を禁止。「治る」「効く」ではなく「病気平癒祈願で知られる」に統一する。
+
+  - id: yakuyoke
+    label: 厄除け・開運
+    minors:
+      - { id: yakuyoke_only,    label: 厄除け }
+      - { id: houyoke,          label: 方除け }
+      - { id: kaiun,            label: 開運・所願成就 }
+    typical_shinto: 八幡宮、総社系
+    typical_buddhist: 不動明王、大師信仰
+
+  - id: anzan
+    label: 安産・子授け・子育て
+    minors:
+      - { id: anzan_only,       label: 安産 }
+      - { id: kosazuke,         label: 子授け }
+      - { id: kosodate,         label: 子育て・成長 }
+    typical_shinto: 浅間（木花咲耶姫）、水天宮
+    typical_buddhist: 鬼子母神、子安観音、地蔵
+
+  - id: koutsuu
+    label: 交通安全
+    minors:
+      - { id: koutsuu_anzen,    label: 交通安全 }
+      - { id: ryokou_anzen,     label: 旅行安全 }
+      - { id: koukuu_anzen,     label: 航空安全 }
+    typical_shinto: 宗像、住吉、愛宕、猿田彦
+    typical_buddhist: 不動
+
+  - id: shoubu
+    label: 勝負・出世
+    minors:
+      - { id: shoubu_un,        label: 勝負運 }
+      - { id: shusse,           label: 出世 }
+      - { id: hisshou_sports,   label: 必勝・スポーツ }
+    typical_shinto: 八幡、愛宕（出世の石段）、諏訪
+    typical_buddhist: 毘沙門天、不動
+
+  # ── 以下2つは調査で追加 ──────────────────────────────
+  - id: kanai
+    label: 家内安全・家庭円満
+    added_reason: ホトカミ実測 3,710件。提示8分類のどこにも入らない。
+    minors:
+      - { id: kanai_anzen,      label: 家内安全 }
+      - { id: kazoku_buji,      label: 家族の無事 }
+      - { id: pet,              label: ペット祈願・供養 }
+    typical_shinto: 稲荷、住吉、八幡ほか広範
+    typical_buddhist: 地蔵ほか
+
+  - id: nariwai
+    label: 生業・技芸
+    added_reason: ホトカミ実測 五穀豊穣 4,276件（最多）。海上安全・火除け・芸能も収容。
+    minors:
+      - { id: gokoku_houjou,    label: 五穀豊穣 }
+      - { id: houryou,          label: 豊漁 }
+      - { id: kaijou_anzen,     label: 海上安全・航海安全 }
+      - { id: hiyoke,           label: 火除け・防火 }
+      - { id: geinou_gigei,     label: 芸能・技芸上達 }
+      - { id: biyou,            label: 美容 }
+    typical_shinto: 稲荷、天照、スサノオ、諏訪、宗像、住吉、愛宕、市杵島姫
+    typical_buddhist: 弁財天
+
+# UI 方針
+# - 第1階層 = majors（10）を入口にする
+# - 第2階層 = minors で絞り込む
+# - 検索の既定対象は weight: primary のみ（cluster_benefits.yaml を参照）
+#   secondary はトグル「関連する御利益も含める」で開放する

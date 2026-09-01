@@ -1,0 +1,101 @@
+# MairiMichi 参拝作法 v1
+#
+# 【最重要の運用ルール】
+#   作法は推定してはならない。
+#   御利益は「祭神からの推定」と明示すれば許容されるが、作法は現地での行動を
+#   規定するため、外れると実害が出る。
+#
+#   - 例外の登録は、その社寺の公式サイト等の一次情報のURLが取れた場合のみ
+#   - source_type: official とし、UI に出典リンクを表示する
+#   - 出典が取れない例外情報は登録しない（ブログ・まとめ記事だけを根拠にしない）
+#   - 全ページに固定文言:
+#       「作法は社寺により異なる場合があります。現地の案内表示に従ってください。」
+
+version: 1
+updated: 2026-08-31
+
+# ── 既定値 ────────────────────────────────────────────
+defaults:
+  shrine:
+    bow_before: 2
+    clap: 2
+    bow_after: 1
+    label: 二礼二拍手一礼
+    source_type: default
+    note: 一般的な作法です。
+  temple:
+    bow_before: 1
+    clap: 0            # ★ 寺院は拍手を打たない
+    bow_after: 1
+    label: 合掌（拍手はしません）
+    source_type: default
+    note: 山門で一礼し、本堂で静かに合掌します。拍手は打ちません。
+
+# ── 個別ルール（Phase 1 シード・要一次情報確認）───────
+# status: PENDING_VERIFICATION = 広く流布しているが公式サイトでの裏取りが未了。
+#         実装前に各社の公式サイトで確認し、source_url を埋めてから
+#         source_type: official に昇格させること。確認できなければ登録しない。
+overrides:
+  - site_key: izumo-taisha
+    name: 出雲大社
+    prefecture: 島根県
+    bow_before: 2
+    clap: 4
+    bow_after: 1
+    label: 二礼四拍手一礼
+    source_url: null
+    source_type: pending
+    status: PENDING_VERIFICATION
+
+  - site_key: usa-jingu
+    name: 宇佐神宮
+    prefecture: 大分県
+    bow_before: 2
+    clap: 4
+    bow_after: 1
+    label: 二礼四拍手一礼
+    source_url: null
+    source_type: pending
+    status: PENDING_VERIFICATION
+
+  - site_key: yahiko-jinja
+    name: 彌彦神社
+    prefecture: 新潟県
+    bow_before: 2
+    clap: 4
+    bow_after: 1
+    label: 二礼四拍手一礼
+    source_url: null
+    source_type: pending
+    status: PENDING_VERIFICATION
+
+  - site_key: ise-jingu
+    name: 伊勢神宮
+    prefecture: 三重県
+    bow_before: 2
+    clap: 2
+    bow_after: 1
+    label: 二拝二拍手一拝（一般参拝）
+    notes: 外宮・内宮の参拝順、参道の歩く側など、独自の慣習がある。
+    source_url: null
+    source_type: pending
+    status: PENDING_VERIFICATION
+
+# ── 宗派に起因するルール（御朱印と連動）──────────────
+# Site.denomination（宗派）から自動で注記を出す。
+# 宗派は ja.Wikipedia Template:日本の寺院 の `宗派` パラメータから取得可能
+# （充足率は未計測）。
+denomination_rules:
+  - denomination: 浄土真宗
+    match: [浄土真宗, 真宗大谷派, 浄土真宗本願寺派, 真宗高田派, 真宗佛光寺派]
+    goshuin_note: |
+      浄土真宗では原則として御朱印を授与していません。
+      一部の寺院で「法語印」を授与している場合があります。
+    goshuin_default: no
+
+  - denomination: 日蓮宗
+    match: [日蓮宗, 法華宗, 日蓮正宗, 顕本法華宗]
+    goshuin_note: |
+      日蓮宗では「御首題」を授与します。「妙法」との区別があり、
+      御首題帳でないとお断りされる場合があります。
+    goshuin_default: unknown

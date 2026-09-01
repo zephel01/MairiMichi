@@ -1,0 +1,317 @@
+# MairiMichi 古典・史料の典拠づけ設定 v1
+#
+# 目的: 「なぜこの社がこの御利益で信仰されてきたのか」を一次史料までさかのぼり、
+#       原文と出典を添えて示す。競合10サービスのどこもやっていない差別化の核。
+#
+# 【なぜこれが強いか】
+#   1. 古典の原文はパブリックドメイン → 法的にもっとも安全な素材
+#   2. 時間が経っても古びない（体験談やランキングと違う）
+#   3. 「祭神が◯◯だから」の一段先を示せる
+#
+# 【★最大の盲点】
+#   ja.wikisource に古事記・日本書紀・延喜式の本文は無い。
+#   版一覧のスタブのみで、「古事記 (原文)」「出雲国風土記」「日本三代実録」は404。
+#   本文は全て zh.wikisource（中国語版）にある。漢文原文なので当然だが、
+#   素直に ja 版を探すと「無い」と誤結論する。
+
+version: 1
+updated: 2026-08-31
+
+# ── 第0層: 社の同定（背骨）──────────────────────────
+layer0_identification:
+  - id: wikidata
+    role: 主キー。社名・座標・外部IDを束ねる
+    license: CC0
+    note: 出典としては弱い（二次情報）が、背骨としては最適
+
+  - id: kokugakuin_shikinai
+    name: 國學院大學デジタルミュージアム 延喜式内社データベース
+    url: https://d-museum.kokugakuin.ac.jp/topics_detail12/
+    role: 神名帳の記載と現存社を結ぶ。★式内社の比定はこれが本命
+    coverage: 2,861社 / 3,132座（官幣573社737座・国幣2,288社2,395座）
+    fields: [国名, 郡名, 座数, 官幣国幣, 社格, 神階の変遷, 標注, 現社名, 緯度経度, 複数の論社]
+    provenance: 科研費新学術領域研究（領域番号19H05732）
+    license: 利用申請不要。商用・非商用問わず条件遵守で可
+    caveat: |
+      「解説」「テキスト内容」等の創作性が伴う情報は著作権を有する場合があり、
+      引用の明示が必要。不特定多数頒布は利用フォームで団体名・利用目的を入力。
+    api: なし（一括DLリンクも無い）。★要問い合わせ・クリティカルパス
+
+  - id: kokugakuin_shiryo_modern
+    name: 國學院 神道・神社史料集成（現代）
+    role: 近代社格の補完
+    coverage: 旧官国幣社（別格含む）以下・府県社以上の約1,500社
+    fields: [現行社名, 鎮座地, 公式サイトURL, 通称, 式内社の別, 二十二社の別]
+    license: 利用申請不要
+
+# ── 第1層: 一次史料の直接引用（全自動・原文PD）──────
+layer1_primary:
+  source_repository:
+    id: zh_wikisource
+    dump: https://dumps.wikimedia.org/zhwikisource/latest/zhwikisource-latest-pages-articles.xml.bz2
+    why_dump: zh.wikisource の API はレート制限が厳しく429が頻発する
+    license_original: PD（千年以上前の著作物。保護期間の概念が及ばない）
+    license_annotations: CC BY-SA 4.0（Wikisource編集者による句読・校勘注・異体字併記）
+    strategy: |
+      校勘注を落として原文だけを使えば PD 素材の利用となり継承義務は発生しない。
+      ただし校勘注は品質担保に有用なので、注ごと使って CC BY-SA 表示するのが安全。
+
+  works:
+    - id: engishiki_jinmyocho
+      name: 延喜式 神名帳
+      volumes: [巻第九, 巻第十]
+      url: https://zh.wikisource.org/wiki/延喜式/卷第九
+      size_bytes: [39178, 44845]
+      priority: ★最重要
+      yields:
+        - 式内社2,861社を 国 → 郡 → 社 の階層で
+        - 社格（名神大 / 大 / 小）
+        - 官幣・国幣の別（案上官幣 / 案下官幣 / 国幣）
+        - 祭祀（月次 / 新嘗 / 相嘗 の預かり）
+        - 座数
+      parse_hazards:
+        - "割注が ／…∥ という独自記法。例: 乙訓坐大雷神社／名神大。月／次新甞。∥"
+        - "〓（欠字）と ■ マーカーが散在。冒頭の総数規定も「天神地祇惣三千一百〓二座」"
+        - "貞コ（おそらく「貞観」）のような文字コード変換の残骸"
+        - "現在の比定社（論社）は含まれない → kokugakuin_shikinai で突合する"
+      note: 延喜式50巻全体（祝詞式・臨時祭式など）も同じ場所にある
+
+    - id: fudoki
+      name: 風土記
+      url: https://zh.wikisource.org/wiki/古風土記/出雲國風土記
+      coverage: 現存5か国すべて（出雲・常陸・播磨・肥前・豊後）
+      priority: ★高（地域密着の記述に最適）
+      yields:
+        - 地名起源譚・鎮座譚（例: 出雲国風土記の国引き神話「所以號意宇者、國引坐八束水臣津野命詔…」）
+        - 神社の員数（出雲: 合神社參佰玖拾玖所 = 在神祇官184所 + 不在215所）
+        - 郡郷の改称記録（和銅期の好字二字化の痕跡）
+
+    - id: rikkokushi
+      name: 六国史
+      coverage: 日本書紀 / 続日本紀 / 日本後紀 / 続日本後紀 / 日本文徳天皇実録 / 日本三代実録（全巻）
+      url: https://zh.wikisource.org/wiki/日本三代實錄
+      yields: 神階の叙位記事
+      note: |
+        社との紐付けは自前作業。ただし紐付け済みデータが國學院にある（layer1_shinkai 参照）。
+
+    - id: kiki
+      name: 古事記・日本書紀・先代旧事本紀
+      coverage: 古事記（序・上中下 全4ページ、上巻64,383B）／日本書紀 全30巻／先代旧事本紀 全10巻
+      url: https://zh.wikisource.org/wiki/古事記
+      yields: 祭神の神話上の事績
+
+    - id: wamyoruijusho
+      name: 和名類聚抄
+      coverage: 天部・地部・水部・歳時部のみ（★部分的）
+      status: 補助
+
+  layer1_shinkai:
+    id: kokugakuin_shiryo_ancient
+    name: 國學院 神道・神社史料集成（古代）
+    url: https://d-museum.kokugakuin.ac.jp/jinja/explanatorynote/
+    priority: ★神階の一次資料はこれが決定版
+    coverage: 約450社
+    selection: |
+      ①延喜式神名帳で大社として記載 ②六国史終了時点で神階四位以上 ③史料上特に注目される社
+    yields:
+      - 各社ごとに六国史の該当記事原文を集成（『日本書紀』神代巻以外）
+      - 年代順に12区分で配列（大化前代/645-671/672-700/701-728/729-756/757-781/782-809/810-833/834-858/859-884/885-900/その他）
+      - 神階昇叙グラフ（PDF）
+    encoding: UTF-8。異体字は新字体に統一
+    provenance: 岡田莊司編『古代諸国神社神階制の研究』（岩田書院, 2002）／21世紀COE
+    license: 利用申請不要。★ただし神階昇叙グラフの利用は要問い合わせ
+    caveat: |
+      凡例に「新システムへの移行作業の一環として、神社名や収録史料の表記等の
+      見直しをしております。作業未完了の箇所があります」とありデータが流動的。
+    api: なし。検索画面の直接URLも未特定（/jinja/list, /jinja/search, /jinja/db はすべて404）
+
+# ── 第2層: 読み下し・現代語（PD限定）────────────────
+layer2_modern_japanese:
+  - id: aozora_takeda_kojiki
+    name: 武田祐吉『校註 古事記』『現代語譯 古事記』
+    urls:
+      - https://www.aozora.gr.jp/cards/001518/card51731.html   # 校註（書き下し＋脚注）351,915B
+      - https://www.aozora.gr.jp/cards/001518/card51732.html   # 現代語訳 236,864B
+    also: [card51727 凡例, card51728 解説]
+    license: PD
+    license_reasoning: |
+      武田祐吉は1958年3月29日没。旧50年ルールで2009年にPD化。
+      2018年のTPP関連法による保護期間70年への延長では、
+      「延長時点で既に消滅していた権利は復活しない」ため PD のまま。
+      青空文庫のCSVでも人物・作品とも著作権フラグ「なし」。
+    significance: ★「現代語訳は著作権がある」という一般則の重要な例外。全文掲載できる。
+    底本: 角川文庫 1956年初版
+    caveat: 凡例に索引の存在が書かれているが、青空文庫には索引は未収録
+
+  policy_other_translations: |
+    岩波古典大系・小学館全集・中公文庫等の現代語訳は訳者に著作権があり、
+    引用の範囲のみ（著作権法32条: 主従関係／明瞭区別／必然性／出所明示）。
+    ★訳文を並べて掲載するのは不可。
+    日本書紀・風土記・六国史には同等のPD訳が揃わないため、
+    原文 ＋ 自前の要約 で対応する。
+
+# ── 第3層: 地域の伝承・近代の記録（半自動）──────────
+layer3_regional:
+  - id: ndl_tsugidigi
+    name: NDL次世代デジタルライブラリー API
+    url: https://lab.ndl.go.jp/service/tsugidigi/apiinfo/
+    base: https://lab.ndl.go.jp/dl/api/
+    priority: ★唯一クリーンに自動化できる地域資料ルート
+    coverage: 著作権保護期間満了資料のみ（図書28万点＋古典籍8万点）
+    auth: 不要（APIキーなしで動作を確認済み）
+    endpoints:
+      - /book/search?keyword=...&size=...     # highlights にスニペットが返る
+      - /book/{PID}
+      - /book/fulltext-json/{PID}             # ページ単位OCRテキスト＋文字ごとのbbox座標
+      - /book/fulltext/{PID}
+      - /page/search                          # ★keyword だけだと400。必須パラメータ未確認
+      - /illustration/{PID}_{page}_{number}
+    bulk: 全文テキストの一括DL（JSON/Zip）あり
+    yields: 明治〜昭和戦前の県神社誌・郡誌・社寺縁起
+    caveat: ★OCR品質は資料により大きくばらつく。「OCRのため誤りを含む場合があります」を必ず表示
+
+  - id: kokuritsu_kobunshokan
+    name: 国立公文書館デジタルアーカイブ
+    url: https://www.digital.archives.go.jp/secondary-use
+    license:
+      metadata: CC0 1.0（機械判読可能な形式で公開）
+      images: 申請不要。営利・非営利を問わず自由に複製・改変・再配布可
+      descriptions: CC-BY 4.0
+    attribution: 推奨（義務ではない）。「国立公文書館所蔵」＋資料名＋請求番号＋URI
+    caveat: 本文検索はあるが「校正・確認が行われていないテキストデータ」
+    api: エンドポイント未特定
+
+  - id: japansearch
+    name: ジャパンサーチ
+    url: https://jpsearch.go.jp/static/developer/
+    sparql: https://jpsearch.go.jp/rdf/sparql/    # トリプル数 1,622,106,322
+    simple_api: https://jpsearch.go.jp/api/item/search/jps-cross?keyword=...&size=...
+    auth: 不要
+    role: 横断検索の入口。★ライセンスは提供元ごとにバラバラなので rights でフィルタ必須
+    rights_facet_observed:   # 「神社」検索時の実測
+      others: 85508
+      incr: 39976
+      edu: 31162
+      noncom: 21814
+      com: 21111
+      ccby: 8696
+      pdm: 8623
+      ccbysa: 3149
+      cc0: 643
+    note: "ADEAC のメタデータ取得に使う: ?f-db=adeac"
+
+  - id: municipal_opendata
+    name: 自治体オープンデータ「文化財一覧」
+    status: 期待しすぎない
+    finding: |
+      富士宮市型（名称・種別・所在地・指定日だけ、解説文なし）が標準形。
+      松原市型（「概要」「説明」項目あり・CC BY 4.0）は例外。
+      解説文つきの自治体は10〜20オーダーとみられる（悉皆調査は未実施）。
+    catalog: https://search.ckan.jp/    # 「文化財」3,649件だが2,880件はIRDBのノイズ
+
+# ── 第4層: 御利益との接続（★人の判断。自動化しない）──
+layer4_connection:
+  policy: 自動化してはいけない。第1〜3層の材料を並べて編集者が接続を書く。
+  display_rule: |
+    各文に「層のラベル」と「出典」を必ず付ける。
+    「一次史料にこう書いてある（第1層）」
+    「後世こう解釈された（第3層）」
+    「編集部の見解（第4層）」
+    を視覚的に区別する。推測と出典の混同を防ぐ。
+  patterns:
+    - id: myth
+      label: 祭神の神話上の事績から
+      example: 記紀の該当条を直接引用（大国主の国譲り・因幡の白兎など）
+    - id: shikinai_rank
+      label: 式内社の社格・祭祀から
+      example: |
+        「名神大で月次・新嘗・相嘗すべてに預かる＝国家的な祈年穀の対象だった」は
+        延喜式の割注だけで言える事実。推測を挟まずに書ける最も強い型。
+    - id: shinkai
+      label: 神階の昇叙から
+      example: 六国史の叙位記事＋國學院の神階グラフ。「なぜこの時期に急に昇叙されたか」は地域史と接続できる
+    - id: fudoki
+      label: 風土記の地名起源譚から
+      example: 土地と神を結ぶ記述（出雲国風土記の国引き神話など）
+    - id: modern
+      label: 近世〜近代の信仰実態から
+      example: NDL全文検索でヒットした県神社誌・郡誌の記述
+
+# ── 使わないもの ──────────────────────────────────
+rejected:
+  - id: ja_wikisource
+    verdict: 本文が存在しない
+    detail: |
+      「古事記」1,480B・「日本書紀」1,247B・「延喜式」1,073B はいずれも版一覧テンプレート。
+      「古事記 (国史大系)」318B はスタブ。
+      「古事記 (原文)」「出雲国風土記」「日本三代実録」は404。
+      版一覧内のリンクが [[:zh:古事記]] = 中国語版へのインターウィキになっている。
+
+  - id: bunka_isan_online
+    name: 文化遺産オンライン
+    url: https://online.bunka.go.jp/about
+    verdict: テキスト取り込み不可
+    detail: |
+      「法律で認められたものを除き、無断で転用・引用・改変することを禁じます」
+      All Rights Reserved。API も無い（/api は404）。リンク先としてのみ使う。
+    note: ドメイン移転済み（bunka.nii.ac.jp → online.bunka.go.jp）
+
+  - id: adeac
+    name: ADEAC（自治体史デジタルアーカイブ）
+    verdict: 自動収集不可
+    detail: |
+      本文がbase64様の難読化ペイロードとしてJS経由でクライアント側描画されている。
+      常総市『石下町史』のページ（430,962バイト）をHTTP取得してタグ除去したところ、
+      残った可読テキストはわずか194文字（ナビゲーションのみ）。
+      意図的に自動収集を防いでいると解釈すべき。
+      横断検索 /search も外部から使えない。統一ライセンスなし（機関ごとの利用規定）。
+    workaround: ジャパンサーチ経由でメタデータを取得（?f-db=adeac）→ リンク＋人力引用
+
+  - id: ksj_p32
+    name: 国土数値情報 P32 都道府県指定文化財
+    verdict: 商用不可
+    detail: 非商用限定。基準日2014年1月31日。東京都・奈良県・大分県は全て非公開。解説文なし。
+
+  - id: kunishitei_bunkazai
+    name: 国指定文化財等データベース
+    verdict: 引用扱い（要確認）
+    detail: |
+      詳細ページに「解説文」「詳細解説」「創建及び沿革」フィールドが存在することを実物で確認。
+      ただし建造物は解説文が空のレコードが多い。
+      表示は All Rights Reserved（文化庁）、利用規約ページ /bsys/tos が404で詳細未確認。
+
+  - id: kokugakuin_photo_db
+    name: 國學院 一宮写真DB・二十二社写真DB
+    verdict: 商用不可
+    detail: Research and educational purposes only
+
+  - id: yokai_db
+    name: 怪異・妖怪伝承データベース（国際日本文化研究センター・35,307件）
+    verdict: 保留
+    detail: |
+      All rights reserved。二次利用条件の明記なし。API・一括DLも無い。
+      運営自身が「残酷なものや差別的な表現など、現代の基準に照らせば不適切なものが
+      ありますが…原資料の元の状態で公開しています」と告知しており、
+      そのまま一般向けサービスに流すのは不適切。
+      そもそも妖怪・怪異の事例集で、社寺縁起を網羅する目的のDBではない。
+
+  - id: modern_translations
+    name: 岩波・小学館・中公等の現代語訳
+    verdict: 引用の範囲のみ
+    detail: 訳者に著作権。訳文を並べて掲載するのは不可。
+
+  - id: jinjahoncho_beppyo
+    name: 神社本庁の別表神社一覧 / 全国一の宮会の一覧
+    verdict: データなし
+    detail: |
+      一次的な機械可読データは発見できず（未確認: 神社本庁への直接照会はしていない）。
+      検索で出てくるのは Wikipedia・SHINDEN・個人サイトのみ。
+      Wikidata（CC0）で代替する。
+
+# ── 実装順（最初の90日）────────────────────────────
+implementation_order:
+  1: zh.wikisource ダンプ取得 → 延喜式神名帳のパーサ実装（／…∥ 記法と 〓 欠字の処理が山場）
+  2: Wikidata + 國學院式内社DB で社の名寄せ辞書を構築
+  3: 青空文庫の武田祐吉『古事記』を投入し、古事記系の祭神は第2層まで完成させる
+  4: NDL次世代DL API で社名検索のバッチを回し、ヒット率を実測する
+  5: ★國學院に商用利用の意図を明示して利用フォームを提出（式内社DB・神社史料集成の両方）
