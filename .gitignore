@@ -1,0 +1,27 @@
+# Cowork セッションの作業用出力。残す価値があるものだけ docs/ へ昇格させる
+_OUTPUTS/
+_to_delete/
+
+# ETL の作業データ（巨大。数GB になる）
+etl-cache/
+*.osm.pbf
+*.xml.bz2
+*.bz2
+dumps/
+
+# 依存・ビルド成果物（app/.gitignore にもあるが、ルートでも押さえる）
+node_modules/
+.next/
+.open-next/
+out/
+*.tsbuildinfo
+.wrangler/
+
+# 秘密情報
+.env
+.env.local
+.dev.vars
+
+# OS
+.DS_Store
+Thumbs.db

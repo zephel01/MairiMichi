@@ -1,0 +1,51 @@
+{
+  "name": "mairimichi",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "MairiMichi: 御利益・アクセス難易度・御朱印で神社仏閣を探す Web アプリ",
+  "engines": {
+    "node": "^20.19.0 || ^22.12.0 || >=24.0.0"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "predev": "node scripts/check-app-router.mjs",
+    "build": "next build",
+    "prebuild": "node scripts/check-app-router.mjs",
+    "start": "next start",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "check:approuter": "node scripts/check-app-router.mjs",
+    "etl:validate": "tsx src/etl/validate.ts",
+    "etl:extract": "tsx src/etl/classical/run-extract.ts",
+    "etl:shikinai": "tsx src/etl/classical/run-shikinai.ts",
+    "etl:priority": "tsx src/etl/priority/run-priority.ts",
+    "etl:gaps": "tsx src/etl/run-gaps.ts",
+    "cf:build": "opennextjs-cloudflare build",
+    "cf:deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "cf:typegen": "wrangler types"
+  },
+  "dependencies": {
+    "leaflet": "^1.9.4",
+    "next": "^16.3.4",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "server-only": "^0.0.1",
+    "yaml": "^2.6.1"
+  },
+  "devDependencies": {
+    "@opennextjs/cloudflare": "^1.0.0",
+    "@types/leaflet": "^1.9.21",
+    "@types/node": "^20.14.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17",
+    "tsx": "^4.16.0",
+    "typescript": "^5.5.4",
+    "vitest": "^4.1.11",
+    "wrangler": "^4.125.0"
+  }
+}
