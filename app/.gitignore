@@ -1,0 +1,16 @@
+node_modules/
+.next/
+.open-next/
+out/
+*.tsbuildinfo
+vitest.config.ts.timestamp-*
+.env.local
+.dev.vars
+.wrangler/
+
+# ETL の作業データ（巨大。Git に入れない）
+etl-cache/
+*.osm.pbf
+*.xml.bz2
+*.bz2
+dumps/

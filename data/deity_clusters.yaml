@@ -1,0 +1,279 @@
+# MairiMichi 神格クラスタ v1（Phase 1 シード）
+#
+# なぜ必要か:
+#   Wikidata では同一の信仰対象が別QIDに分裂している。
+#     八幡神 Q261637(1,741) ⇔ 応神天皇 Q317997(334)
+#     稲荷神 Q719665(1,154) ⇔ ウカノミタマ Q3080728(157)
+#     天満大自在天神 Q1753428(655) ⇔ 菅原道真 Q382005(170)
+#     素戔嗚尊 Q272993(1,003) ⇔ 牛頭天王 Q11570247(580)
+#     観音は 6分裂（十一面387/聖観音273/千手262/観世音185/如意輪98/観音菩薩46）
+#   さらに ja.Wikipedia infobox の祭神は 41.2% がパイプ付きリンク、40.7% が
+#   リンクなし素テキストで、表記ゆれが常態。
+#
+# 効果（400社サンプルでの実測）:
+#   素朴な40エントリ辞書        → 165社 (41.2%)
+#   ＋素テキスト照合             → 195社 (48.8%)
+#   27クラスタ＋別名辞書に再設計 → 274社 (68.5%)   ★
+#
+# 突合の優先順:
+#   1. Wikidata QID 完全一致
+#   2. ja.Wikipedia のリンク先記事名 完全一致（表示名ではなくリンク先を使う）
+#   3. aliases への正規化後の文字列一致
+#   4. 一致しなければ cluster: null（＝御利益は unknown。隠さず出す）
+
+version: 1
+updated: 2026-08-31
+
+clusters:
+  # ── 神道 ────────────────────────────────────────────
+  - id: hachiman
+    label: 八幡
+    religion: shinto
+    qids: [Q261637, Q317997]
+    aliases: [八幡神, 八幡大神, 誉田別命, 譽田別命, 品陀和気命, 応神天皇, 應神天皇, 八幡大菩薩]
+    sample_hits_400: 43
+
+  - id: inari
+    label: 稲荷
+    religion: shinto
+    qids: [Q719665, Q3080728]
+    aliases: [稲荷神, 稲荷大神, 宇迦之御魂神, 宇迦之御魂大神, ウカノミタマ, 倉稲魂命, 保食神, 御饌津神]
+    sample_hits_400: 15
+
+  - id: susanoo
+    label: スサノオ
+    religion: shinto
+    qids: [Q272993, Q11570247]
+    aliases: [素戔嗚尊, 素盞嗚尊, 素盞鳴命, 須佐之男命, スサノオ, 牛頭天王, 建速須佐之男命]
+    sample_hits_400: 32
+
+  - id: amaterasu
+    label: 天照
+    religion: shinto
+    qids: [Q455602]
+    aliases: [天照大神, 天照大御神, 天照皇大神, アマテラス, 大日孁貴, 天照坐皇大御神]
+    sample_hits_400: 43
+
+  - id: tenjin
+    label: 天神
+    religion: shinto
+    qids: [Q1753428, Q382005]
+    aliases: [菅原道真, 菅原道真公, 天満大自在天神, 天神, 菅公]
+    sample_hits_400: 17
+
+  - id: okuninushi
+    label: 大国主
+    religion: shinto
+    qids: [Q276944, Q10936701]
+    aliases: [大国主神, 大國主命, 大己貴命, 大穴牟遅神, オオクニヌシ, 大物主神, 大己貴神]
+    sample_hits_400: 43
+
+  - id: kasuga
+    label: 春日（鹿島・香取）
+    religion: shinto
+    qids: [Q11088805, Q1502690, Q1107286]
+    aliases: [春日神, 建御雷之男神, タケミカヅチ, 武甕槌命, 経津主神, フツヌシ, 天児屋命, 天児屋根命]
+    sample_hits_400: 23
+
+  - id: jingu_kogo
+    label: 神功皇后
+    religion: shinto
+    aliases: [神功皇后, 息長帯姫命, 息長足姫尊]
+    sample_hits_400: 22
+
+  - id: yamatotakeru
+    label: ヤマトタケル
+    religion: shinto
+    aliases: [日本武尊, 倭建命, ヤマトタケル, 日本武命]
+    sample_hits_400: 19
+
+  - id: hie_sanno
+    label: 日枝・山王
+    religion: shinto
+    qids: [Q10935105]
+    aliases: [大山咋神, 大山咋命, 山王権現, 日吉大神]
+    sample_hits_400: 17
+
+  - id: sukunahikona
+    label: 少彦名
+    religion: shinto
+    aliases: [少彦名命, 少名毘古那神, スクナヒコナ, 少彦名神]
+    sample_hits_400: 17
+
+  - id: toyouke
+    label: 豊受
+    religion: shinto
+    aliases: [豊受大神, 豊受姫命, トヨウケビメ, 豊宇気毘売神, 豊受気媛神]
+    sample_hits_400: 16
+
+  - id: munakata
+    label: 宗像・市杵島
+    religion: shinto
+    aliases: [市杵島姫命, 市寸島比売命, イチキシマヒメ, 宗像三女神, 田心姫命, 湍津姫命, 狭依姫命, 田心姫神]
+    note: 弁財天（bezaiten）と習合。両クラスタを持つ社寺がある。
+    sample_hits_400: 12
+
+  - id: sumiyoshi
+    label: 住吉
+    religion: shinto
+    qids: [Q29682]
+    aliases: [住吉三神, 底筒男命, 中筒男命, 表筒男命, 住吉大神]
+    sample_hits_400: 10
+
+  - id: suwa
+    label: 諏訪
+    religion: shinto
+    qids: [Q9150391, Q9150392]
+    aliases: [建御名方神, 建御名方命, タケミナカタ, 八坂刀売神, 諏訪大明神]
+
+  - id: sengen
+    label: 浅間
+    religion: shinto
+    aliases: [木花咲耶姫命, 木花之佐久夜毘売, コノハナサクヤヒメ, 木花開耶姫命, 浅間大神]
+
+  - id: atago
+    label: 愛宕
+    religion: shinto
+    qids: [Q1101132]
+    aliases: [愛宕権現, 火産霊神, 火之迦具土神, カグツチ, 迦具土神]
+
+  - id: kumano
+    label: 熊野
+    religion: shinto
+    qids: [Q11568925]
+    aliases: [熊野権現, 熊野三所権現, 家都美御子大神, 熊野大神]
+
+  - id: hakusan
+    label: 白山
+    religion: shinto
+    qids: [Q11619891]
+    aliases: [菊理媛神, ククリヒメ, 白山比咩大神, 白山大神]
+
+  - id: sarutahiko
+    label: 猿田彦
+    religion: shinto
+    qids: [Q3090037]
+    aliases: [猿田彦神, 猿田彦大神, サルタヒコ, 道祖神]
+
+  - id: oyamatsumi
+    label: 大山祇
+    religion: shinto
+    qids: [Q386563]
+    aliases: [大山祇神, 大山積神, オオヤマツミ, 大山津見神]
+
+  - id: kanayamahiko
+    label: 金山彦
+    religion: shinto
+    aliases: [金山彦命, 金山毘古命, 金山彦神, 金山姫命]
+
+  - id: ebisu
+    label: 恵比寿
+    religion: shinto
+    aliases: [事代主神, 事代主命, コトシロヌシ, 蛭子命, 恵比寿神, 蛭子神]
+
+  - id: mizuhanome
+    label: 水神
+    religion: shinto
+    aliases: [罔象女神, ミヅハノメ, 水波能売命, 天之水分神]
+
+  # ── 人物神（定型マッピング不可・個別対応）────────────
+  - id: jinbutsu_shin
+    label: 人物神（武将・天皇・国事殉難者）
+    religion: shinto
+    aliases: [織田信長, 徳川家康, 東照大権現, 豊臣秀吉, 源頼朝, 後鳥羽天皇, 崇徳天皇, 平将門, 楠木正成]
+    sample_hits_400: 72
+    benefit_policy: NO_AUTO_MAPPING
+    note: |
+      400社中72社（18%）と最大クラスタだが、定型の御利益マッピングは存在しない。
+      八幡＝応神天皇のように後世に神格化されて御利益が定着した例はあるが、
+      明治以降の招魂社系・武将祀りは個別対応するしかない。
+      Phase 1 で手動 overrides を書く対象。
+
+  # ── 仏教（本尊）────────────────────────────────────
+  - id: yakushi
+    label: 薬師如来
+    religion: buddhist
+    aliases: [薬師如来, 薬師瑠璃光如来, 薬師仏]
+    wikidata_count: 517
+
+  - id: amida
+    label: 阿弥陀如来
+    religion: buddhist
+    aliases: [阿弥陀如来, 阿弥陀仏, 無量寿如来]
+    wikidata_count: 1832
+    note: 「極楽往生」「現世安穏」のみで現世利益に落ちにくい。御利益検索の対象になりにくい。
+
+  - id: shaka
+    label: 釈迦如来
+    religion: buddhist
+    aliases: [釈迦如来, 釈迦牟尼仏, 釈迦如来坐像]
+    wikidata_count: 868
+    note: 同上。
+
+  - id: dainichi
+    label: 大日如来
+    religion: buddhist
+    aliases: [大日如来, 摩訶毘盧遮那]
+    wikidata_count: 248
+
+  - id: kannon
+    label: 観音
+    religion: buddhist
+    aliases: [観音菩薩, 観世音菩薩, 聖観音, 十一面観音, 千手観音, 如意輪観音, 馬頭観音, 准胝観音, 子安観音]
+    wikidata_count: 1251
+    note: Wikidata で6分裂。必ずこのクラスタに寄せる。
+
+  - id: jizo
+    label: 地蔵菩薩
+    religion: buddhist
+    aliases: [地蔵菩薩, 延命地蔵, 子安地蔵, 地蔵尊]
+    wikidata_count: 224
+
+  - id: fudo
+    label: 不動明王
+    religion: buddhist
+    aliases: [不動明王, 大聖不動明王, お不動さま]
+    wikidata_count: 401
+
+  - id: monju
+    label: 文殊菩薩
+    religion: buddhist
+    aliases: [文殊菩薩, 文殊師利菩薩]
+
+  - id: kokuzo
+    label: 虚空蔵菩薩
+    religion: buddhist
+    aliases: [虚空蔵菩薩]
+    wikidata_count: 51
+
+  - id: miroku
+    label: 弥勒菩薩
+    religion: buddhist
+    aliases: [弥勒菩薩, 弥勒仏]
+
+  - id: bishamon
+    label: 毘沙門天
+    religion: buddhist
+    aliases: [毘沙門天, 多聞天]
+    wikidata_count: 43
+
+  - id: daikoku
+    label: 大黒天
+    religion: buddhist
+    aliases: [大黒天, 大黒様]
+
+  - id: benzaiten
+    label: 弁財天
+    religion: buddhist
+    aliases: [弁財天, 弁才天, 弁天, 妙音弁才天]
+    note: 神道の munakata（市杵島姫）と習合。
+
+  - id: kishimojin
+    label: 鬼子母神
+    religion: buddhist
+    aliases: [鬼子母神, 訶梨帝母]
+
+  - id: daishi
+    label: 大師信仰
+    religion: buddhist
+    aliases: [弘法大師, 空海, 弘法大師空海, 元三大師, 慈恵大師]

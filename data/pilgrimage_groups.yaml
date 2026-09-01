@@ -1,0 +1,108 @@
+# MairiMichi 巡礼グループ v1（スキーマ定義とシード）
+#
+# 社寺は単体で参られるとは限らない。複数社寺がセットで信仰されている単位を
+# 第一級のデータとして持ち、詳細ページの「備考」に表示する。
+# v2 の「めぐりコース」（1日で回れるか）の基盤にもなる。
+#
+# データ源:
+#   1. ja.Wikipedia Template:日本の寺院 の `札所等` パラメータ（最有用）
+#   2. Wikidata / ja.Wikipedia の一覧記事（「三社参り」記事など）
+#   3. 各巡礼の公式サイト（都七福神まいり、自治体観光協会など）
+#   4. 手動
+#
+# 参考: ホトカミは巡礼を263件登録している（規模感の目安）
+
+version: 1
+updated: 2026-08-31
+
+kinds:
+  - id: fudasho
+    label: 札所・霊場
+    desc: 番号付きの巡礼路。四国八十八箇所、西国三十三所など
+  - id: seven_gods
+    label: 七福神めぐり
+    desc: 全国に多数。多くは正月に集中して回る
+  - id: three_shrines
+    label: 三社参り
+    desc: 地域ごとに定番ルートがある。正月の慣習として特に九州で盛ん
+  - id: ichinomiya
+    label: 諸国一之宮
+    desc: 令制国ごとの一之宮
+  - id: sandai
+    label: 日本三大◯◯
+    desc: 諸説あるものが多い。必ず「諸説あり」と付記する
+  - id: local
+    label: 地域独自の巡拝路
+
+# ── シード（Phase 1 で埋める代表例）──────────────────
+groups:
+  - id: shikoku88
+    kind: fudasho
+    name: 四国八十八箇所
+    total_count: 88
+    region: 四国
+    numbered: true
+    source_hint: ja.Wikipedia `札所等` に「四国八十八箇所 第N番」の形で入る
+
+  - id: saigoku33
+    kind: fudasho
+    name: 西国三十三所
+    total_count: 33
+    region: 近畿
+    numbered: true
+
+  - id: bando33
+    kind: fudasho
+    name: 坂東三十三観音
+    total_count: 33
+    region: 関東
+    numbered: true
+
+  - id: chichibu34
+    kind: fudasho
+    name: 秩父三十四観音
+    total_count: 34
+    region: 埼玉
+    numbered: true
+
+  - id: miyako7
+    kind: seven_gods
+    name: 都七福神まいり
+    total_count: 7
+    region: 京都
+    note: 年中参拝可能
+    source_url: https://plus.kyoto.travel/entry/miyakosichifukujin-mairi
+
+  - id: osaka7
+    kind: seven_gods
+    name: 大阪七福神めぐり
+    total_count: 7
+    region: 大阪
+
+  - id: shinjuku_yamanote7
+    kind: seven_gods
+    name: 新宿山ノ手七福神めぐり
+    total_count: 7
+    region: 東京
+    source_url: https://www.kanko-shinjuku.jp/course/-/article_2809.html
+
+  - id: saigoku3
+    kind: three_shrines
+    name: 西国三社参り
+    total_count: 3
+    region: 和歌山
+
+  - id: ichinomiya_all
+    kind: ichinomiya
+    name: 諸国一之宮
+    region: 全国
+    note: 令制国ごと。Site.rank にも反映する
+
+# ── 表示ルール ────────────────────────────────────────
+display:
+  section_title: 所属する巡り
+  format: "{group_name}{order_suffix}"      # 例: 「四国八十八箇所 第51番札所」
+  sandai_disclaimer: 諸説あり
+  note: |
+    「日本三大◯◯」は諸説あるものが多い。諸説ある場合は必ず「諸説あり」と
+    付記し、可能なら出典を示すこと。断定しない。

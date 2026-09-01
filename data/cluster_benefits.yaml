@@ -1,0 +1,201 @@
+# MairiMichi 神格クラスタ → 御利益 マスタ v1
+#
+# なぜ主/副の重みが必要か:
+#   主要な祭神はどれも6項目前後の御利益を持ち、五穀豊穣・商売繁盛・家内安全・
+#   厄除け はほぼ全員が持っている。素直に全部付与すると全社寺が全カテゴリに
+#   該当し、検索が機能しない（競合ホトカミの「1寺社に10タグ」問題）。
+#
+#   → primary は各クラスタ 1〜2個だけ。一覧の絞り込みは既定で primary のみ。
+#     secondary は詳細ページで「このほか〜としても信仰されています」と表示し、
+#     トグル「関連する御利益も含める」で検索対象に加える。
+#
+# 表現規約:
+#   「◯◯の御利益があります」と断定しない。
+#   「古くから◯◯の神として信仰されています」「◯◯と伝えられています」を使う。
+#   UI には必ず導出根拠（どの祭神からか）を併記する。
+
+version: 1
+updated: 2026-08-31
+
+# 御利益IDは benefits.yaml の minors.id を参照
+
+mappings:
+  # ── 神道 ────────────────────────────────────────────
+  - cluster: inari
+    primary:   [shoubai_hanjou, gokoku_houjou]
+    secondary: [kinun, kanai_anzen, byouki_heiyu, geinou_gigei]
+
+  - cluster: hachiman
+    primary:   [yakuyoke_only, kaiun]
+    secondary: [shoubu_un, koutsuu_anzen, enmusubi_love, kanai_anzen]
+
+  - cluster: amaterasu
+    primary:   [kaiun]
+    secondary: [gokoku_houjou, kinun, kanai_anzen, kosodate]
+
+  - cluster: tenjin
+    primary:   [gakugyou_jouju, jyuken_goukaku]
+    secondary: [shikaku_chie, geinou_gigei, yakuyoke_only]
+
+  - cluster: okuninushi
+    primary:   [enmusubi_love]
+    secondary: [byouki_heiyu, gokoku_houjou, shoubai_hanjou, fuufu_enman, kaiun]
+
+  - cluster: susanoo
+    primary:   [yakuyoke_only]
+    secondary: [gokoku_houjou, enmusubi_love, kenkou_chouju, gakugyou_jouju]
+    note: 疫病退散・厄災除去が中心。牛頭天王としての祇園信仰も同じ。
+
+  - cluster: kasuga
+    primary:   [shoubu_un]
+    secondary: [yakuyoke_only, kaiun, kanai_anzen]
+
+  - cluster: suwa
+    primary:   [shoubu_un]
+    secondary: [gokoku_houjou, koutsuu_anzen, kenkou_chouju, kaiun]
+
+  - cluster: munakata
+    primary:   [kaijou_anzen, koutsuu_anzen]
+    secondary: [shoubai_hanjou, geinou_gigei, kaiun]
+
+  - cluster: sumiyoshi
+    primary:   [kaijou_anzen]
+    secondary: [koutsuu_anzen, koukuu_anzen, kaiun, gakugyou_jouju, kanai_anzen]
+
+  - cluster: sengen
+    primary:   [anzan_only, kosazuke]
+    secondary: [hiyoke, kaijou_anzen, enmusubi_love, kanai_anzen]
+
+  - cluster: atago
+    primary:   [hiyoke]
+    secondary: [shusse, yakuyoke_only]
+    note: 「出世の石段」で知られる社は shusse を primary に上書きする（overrides）。
+
+  - cluster: sarutahiko
+    primary:   [koutsuu_anzen, ryokou_anzen]
+    secondary: [kaiun, houyoke]
+
+  - cluster: sukunahikona
+    primary:   [byouki_heiyu]
+    secondary: [kenkou_chouju, shoubai_hanjou]
+
+  - cluster: hakusan
+    primary:   [enmusubi_love]
+    secondary: [fuufu_enman, kaiun]
+
+  - cluster: kumano
+    primary:   [kaiun]
+    secondary: [yakuyoke_only, kenkou_chouju]
+
+  - cluster: toyouke
+    primary:   [gokoku_houjou]
+    secondary: [shoubai_hanjou, kanai_anzen]
+
+  - cluster: hie_sanno
+    primary:   [kanai_anzen]
+    secondary: [yakuyoke_only, houyoke, shoubai_hanjou]
+
+  - cluster: jingu_kogo
+    primary:   [anzan_only]
+    secondary: [kosodate, shoubu_un]
+
+  - cluster: yamatotakeru
+    primary:   [shoubu_un]
+    secondary: [yakuyoke_only, ryokou_anzen]
+
+  - cluster: oyamatsumi
+    primary:   [gokoku_houjou]
+    secondary: [kaijou_anzen, shoubai_hanjou]
+
+  - cluster: ebisu
+    primary:   [shoubai_hanjou]
+    secondary: [houryou, kinun, gokoku_houjou]
+
+  - cluster: kanayamahiko
+    primary:   [gokoku_houjou]
+    secondary: [shoubai_hanjou]
+    note: 鉱業・鍛冶・金属加工の神。生業カテゴリの細分化は Phase 2 で検討。
+
+  - cluster: mizuhanome
+    primary:   [gokoku_houjou]
+    secondary: [kanai_anzen]
+
+  - cluster: jinbutsu_shin
+    primary:   []
+    secondary: []
+    policy: NO_AUTO_MAPPING
+    note: |
+      400社中72社（18%）と最大クラスタだが定型マッピングが存在しない。
+      御利益は overrides.yaml で個別に、公式サイトの記載を出典として登録する。
+      出典が無い場合は confidence: unknown のまま「不明」と表示する。
+
+  # ── 仏教 ────────────────────────────────────────────
+  - cluster: yakushi
+    primary:   [byouki_heiyu]
+    secondary: [kenkou_chouju, yakuyoke_only]
+
+  - cluster: kannon
+    primary:   [yakuyoke_only]
+    secondary: [enmusubi_love, anzan_only, kosodate, kanai_anzen]
+
+  - cluster: jizo
+    primary:   [kosazuke, kosodate]
+    secondary: [kanai_anzen, ryokou_anzen]
+
+  - cluster: fudo
+    primary:   [yakuyoke_only]
+    secondary: [kaiun, koutsuu_anzen, shoubu_un]
+
+  - cluster: monju
+    primary:   [shikaku_chie, gakugyou_jouju]
+    secondary: [jyuken_goukaku]
+
+  - cluster: kokuzo
+    primary:   [shikaku_chie]
+    secondary: [gakugyou_jouju, kinun]
+
+  - cluster: bishamon
+    primary:   [shusse, kinun]
+    secondary: [shoubu_un, yakuyoke_only]
+
+  - cluster: daikoku
+    primary:   [kinun]
+    secondary: [shoubai_hanjou, gokoku_houjou, kanai_anzen]
+
+  - cluster: benzaiten
+    primary:   [geinou_gigei]
+    secondary: [kinun, gakugyou_jouju, enmusubi_love, kosazuke]
+
+  - cluster: kishimojin
+    primary:   [kosodate, anzan_only]
+    secondary: [kanai_anzen]
+
+  - cluster: daishi
+    primary:   [yakuyoke_only]
+    secondary: [kaiun, byouki_heiyu]
+
+  - cluster: dainichi
+    primary:   [kaiun]
+    secondary: [yakuyoke_only]
+
+  - cluster: miroku
+    primary:   []
+    secondary: []
+    policy: NO_CURRENT_BENEFIT
+    note: 「衆生救済・極楽往生」で現世利益に落ちない。
+
+  - cluster: amida
+    primary:   []
+    secondary: []
+    policy: NO_CURRENT_BENEFIT
+    note: |
+      Wikidata で寺院の本尊として最多（1,832件）だが「極楽往生」「現世安穏」しか
+      持たず、現世利益の検索対象にならない。寺院の約4割がこれに該当する。
+      欠陥ではなく実態。「御利益の登録なし」と正直に表示し、代わりに文化財指定・
+      札所番号・御朱印情報で価値を出す。
+
+  - cluster: shaka
+    primary:   []
+    secondary: []
+    policy: NO_CURRENT_BENEFIT
+    note: 同上（868件）。
